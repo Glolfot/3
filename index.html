@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление Пользователями</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .tab-container { display: flex; }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-bottom: none;
+        }
+        .tab.active {
+            background-color: white;
+            border-bottom: 1px solid white;
+        }
+        .tab-content {
+            padding: 20px;
+            border: 1px solid #ccc;
+            display: none;
+        }
+        .tab-content.active { display: block; }
+        #user-list { margin-top: 20px; }
+        .user { display: flex; align-items: center; margin: 10px 0; }
+        .user img { width: 50px; height: 50px; border-radius: 50%; margin-right: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="tab-container">
+        <div class="tab active" data-tab="addUser">Добавить пользователя</div>
+        <div class="tab" data-tab="viewUsers">Список пользователей</div>
+    </div>
+
+    <div id="addUser" class="tab-content active">
+        <h1>Добавить пользователя</h1>
+        <input type="text" id="name" placeholder="Имя" required>
+        <input type="date" id="dob" placeholder="Дата рождения" required>
+        <input type="file" id="avatar" accept="image/*" required>
+        <button id="addUserButton">Добавить пользователя</button>
+    </div>
+
+    <div id="viewUsers" class="tab-content">
+      <h2>Список пользователей</h2>
+      <div id="user-list"></div>
+    </div>
+
+
+<script>
+    const users = [];
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', function() {
+        const tabId = this.getAttribute('data-tab');
+        tabs.forEach(t => t.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+        this.classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+
+        if (tabId === 'viewUsers') {
+          displayUsers(); // Update users list when switching to View Users
+         }
+      });
+    });
+
+
+    document.getElementById('addUserButton').addEventListener('click', function() {
+        const name = document.getElementById('name').value;
+        const dob = document.getElementById('dob').value;
+        const avatarInput = document.getElementById('avatar');
+        const avatarFile = avatarInput.files[0];
+
+        if (name && dob && avatarFile) {
+            const reader = new FileReader();
+
+            reader.onload = function(event) {
+                const user = { name, dob, avatar: event.target.result };
+                users.push(user);
+                displayUsers();
+            };
+
+            reader.readAsDataURL(avatarFile);
+            clearInputs();
+        } else {
+            alert('Пожалуйста, заполните все поля.');
+        }
+    });
+
+    function displayUsers() {
+        const userList = document.getElementById('user-list');
+        userList.innerHTML = ''; 
+        users.forEach(user => {
+            const userDiv = document.createElement('div');
+            userDiv.className = 'user';
+            userDiv.innerHTML = `<img src="" alt="Аватарка">
+                                <strong>${user.name}</strong> (${user.dob})`;
+            userList.appendChild(userDiv);
+        });
+    }
+
+    function clearInputs() {
+        document.getElementById('name').value = '';
+        document.getElementById('dob').value = '';
+        document.getElementById('avatar').value = '';
+    }
+</script>
+
+</body>
+</html>
